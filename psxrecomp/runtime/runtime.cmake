@@ -158,6 +158,7 @@ set(PSXRECOMP_RUNTIME_SOURCES
     ${PSXRECOMP_ROOT}/runtime/src/game_options.c
     ${PSXRECOMP_ROOT}/runtime/src/psx_keybinds.c
     ${PSXRECOMP_ROOT}/recompiler/src/config_loader.cpp
+    ${PSXRECOMP_ROOT}/recompiler/src/ps1_exe_parser.cpp
     # Tier-2 in-process JIT backend (sljit, BSD-2-Clause). Single TU; sljit
     # auto-detects the host arch (SLJIT_CONFIG_AUTO). See lib/sljit/LICENSE.
     ${PSXRECOMP_ROOT}/lib/sljit/sljit_src/sljitLir.c
@@ -166,6 +167,7 @@ set(PSXRECOMP_RUNTIME_SOURCES
 set(PSXRECOMP_RUNTIME_INCLUDE_DIRS
     ${PSXRECOMP_ROOT}/runtime/include
     ${PSXRECOMP_ROOT}/recompiler/src
+    ${PSXRECOMP_ROOT}/recompiler/include
     ${PSXRECOMP_ROOT}/recompiler/lib/fmt/include
     ${PSXRECOMP_ROOT}/recompiler/lib/toml11
     ${PSXRECOMP_ROOT}/lib/sljit/sljit_src

@@ -8,6 +8,7 @@
 #include <string>
 
 #include "fmt/format.h"
+#include "ps1_exe_parser.h"
 
 // toml11 is header-only.
 #define TOML11_USE_UNRELEASED_TOML_FEATURES
@@ -566,18 +567,67 @@ GameConfig load_game_config(const fs::path& config_path_in) {
     }
     const fs::path exe_path = fs::absolute(root / exe_field);
 
+    // Auto-detect EXE header values for any field not explicitly set in TOML.
+    // Parses the PS-X EXE header once and fills in load_address, entry_pc,
+    // text_size, and stack_base from the binary. If the EXE cannot be read
+    // (malformed header, file not found) and a required field is missing
+    // from TOML, the error surfaces when the EXE parse itself fails.
+    struct ExeHeaderAuto {
+        bool ok = false;
+        uint32_t load_address = 0;
+        uint32_t entry_pc = 0;
+        uint32_t text_size = 0;
+        uint32_t stack_base = 0;
+    };
+    ExeHeaderAuto auto_hdr;
+    // We only parse the EXE header if at least one field is missing from TOML.
+    const bool need_auto =
+        !game.contains("load_address") || !game.contains("entry_pc") ||
+        !game.contains("text_size") || !game.contains("stack_base");
+    if (need_auto) {
+        std::string err;
+        if (auto exe = PSXRecomp::PS1ExeParser::parse_file(exe_path, err)) {
+            auto_hdr.ok = true;
+            auto_hdr.load_address = exe->load_address();
+            auto_hdr.entry_pc     = exe->entry_point();
+            auto_hdr.text_size    = exe->code_size();
+            auto_hdr.stack_base   = exe->header.stack_base;
+            // Round text_size up to next 4K page if it's not already
+            // page-aligned (the runtime's overlay region floor uses this
+            // as a guard, and the text segment in RAM is always fully
+            // page-reserved even if the EXE doesn't fill the last page).
+            if (auto_hdr.text_size & 0xFFF) {
+                auto_hdr.text_size = (auto_hdr.text_size + 0xFFF) & ~0xFFFu;
+            }
+        }
+    }
+
     const uint32_t load_address =
-        parse_hex(toml::find<std::string>(game, "load_address"), "game.load_address");
+        game.contains("load_address")
+            ? parse_hex(toml::find<std::string>(game, "load_address"), "game.load_address")
+            : (auto_hdr.ok ? auto_hdr.load_address : []() -> uint32_t {
+                throw std::runtime_error(
+                    "game.toml: missing 'load_address' in [game] and could not "
+                    "auto-detect from EXE header");
+              }());
     const uint32_t entry_pc =
         game.contains("entry_pc")
             ? parse_hex(toml::find<std::string>(game, "entry_pc"), "game.entry_pc")
-            : load_address;
+            : (auto_hdr.ok ? auto_hdr.entry_pc : load_address);
     const uint32_t text_size =
-        parse_hex(toml::find<std::string>(game, "text_size"), "game.text_size");
+        game.contains("text_size")
+            ? parse_hex(toml::find<std::string>(game, "text_size"), "game.text_size")
+            : (auto_hdr.ok ? auto_hdr.text_size : []() -> uint32_t {
+                throw std::runtime_error(
+                    "game.toml: missing 'text_size' in [game] and could not "
+                    "auto-detect from EXE header");
+              }());
     const uint32_t stack_base =
         game.contains("stack_base")
             ? parse_hex(toml::find<std::string>(game, "stack_base"), "game.stack_base")
-            : 0x801FFFF0u;
+            : (auto_hdr.ok && auto_hdr.stack_base != 0
+                   ? auto_hdr.stack_base
+                   : 0x801FFFF0u);
 
     // Disc paths: accept either single `disc` or array `discs`.
     std::vector<fs::path> discs;

@@ -89,6 +89,20 @@ if(MINGW OR WIN32)
     target_link_options(psxrecomp-game PRIVATE -Wl,--stack,16777216)
 endif()
 
+# psxrecomp-toml — PS-X EXE → game.toml generator.
+# Standalone tool that analyses a PS-X EXE and generates a complete game.toml
+# config with auto-detected fields (load_address, entry_pc, text_size,
+# stack_base) and optional JAL-target seed generation.
+add_executable(psxrecomp-toml
+    src/ps1_exe_parser.cpp
+    src/main_toml.cpp
+)
+target_include_directories(psxrecomp-toml PRIVATE
+    include
+    lib/fmt/include
+)
+target_link_libraries(psxrecomp-toml PRIVATE fmt)
+
 # ---- baked codegen hash (stale-binary guard) --------------------------------
 # Bake the SAME emitter-source hash the runtime folds into its overlay cache
 # tag (runtime/runtime.cmake -> hash_codegen.cmake, shared canonical list in
