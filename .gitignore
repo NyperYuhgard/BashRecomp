@@ -1,0 +1,51 @@
+# Build outputs
+/build/
+/build-*/
+/out/
+/.happypath/
+
+# Recompiler output (derivative of copyrighted game code, regenerate locally)
+/generated/
+
+# Release packaging artifacts
+release-stage/
+*.zip
+
+# Local PlayStation assets
+/bash/
+/isos/
+/saves/
+*.bin
+*.cue
+*.iso
+*.img
+*.sub
+*.ccd
+*.mcd
+*.mcr
+
+# Ghidra projects and local analysis databases
+*.gpr
+*.rep/
+
+# Local editor/cache files
+.vs/
+.vscode/
+*.user
+*.log
+
+# Runtime artifacts from psx-runtime/psx-beetle launches
+psx_crash.txt
+psx_last_run_report.json
+psx_screenshot.bmp
+starvation_dump.jsonl
+
+# Diagnostic dumps from debug-server probes (wtrace/fntrace/restore/cdrom/mdec/etc.)
+# and ad-hoc screenshots. Root-level only so audit_notes/*.json stays tracked.
+/*.json
+/*.bmp
+/*.bin
+/*.png
+
+# Python caches
+__pycache__/
