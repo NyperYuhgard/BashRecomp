@@ -1,0 +1,19 @@
+format_version = 2
+
+[[package]]
+id = "crash.frame_interp_pack"
+
+[[package]]
+id = "crash.widescreen_pack"
+
+[[feature]]
+package_id = "crash.frame_interp_pack"
+id = "frame-interpolation"
+enabled = false
+[feature.values]
+blend = "linear"
+
+[[feature]]
+package_id = "crash.widescreen_pack"
+id = "widescreen"
+enabled = true
