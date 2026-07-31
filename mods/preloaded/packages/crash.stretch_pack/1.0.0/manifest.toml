@@ -1,0 +1,21 @@
+format_version = 5
+id = "crash.stretch_pack"
+version = "1.0.0"
+name = "Crash Bandicoot Widescreen Stretch"
+author = "Nyper"
+description = "Estira la imagen 4:3 a 16:9 sin ampliar el campo de visión (sin artefactos de culling). Alternativa al mod Widescreen: usa uno u otro."
+license = "MIT"
+resolver = "declarative"
+
+[[target]]
+game_id = "SCUS-94570" # Pon aquí el ID de tu ISO de Crash (ej. SCUS-94154 / SLES-00039)
+
+[[feature]]
+id = "stretch"
+name = "Widescreen Stretch"
+description = "Estira la imagen a 16:9 en lugar de ampliar el campo de visión."
+default_enabled = false
+
+[[plugin]]
+feature = "stretch"
+id = "crash.stretch"

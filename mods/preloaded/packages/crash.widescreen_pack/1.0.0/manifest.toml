@@ -1,0 +1,37 @@
+format_version = 5
+id = "crash.widescreen_pack"
+version = "1.0.0"
+name = "Crash Bandicoot Widescreen"
+author = "Nyper"
+description = "Pantalla panorámica (widescreen) mediante el pipeline nativo de GTE X-squash / native-wide del runtime."
+license = "MIT"
+resolver = "declarative"
+
+[[target]]
+game_id = "SCUS-94570" # Pon aquí el ID de tu ISO de Crash (ej. SCUS-94154 / SLES-00039)
+
+[[feature]]
+id = "widescreen"
+name = "Widescreen"
+description = "Renderiza el juego en panorámico en lugar de 4:3."
+default_enabled = true
+
+[[option]]
+feature = "widescreen"
+id = "aspect_ratio"
+label = "Relación de aspecto"
+description = "Anchura de la imagen panorámica."
+type = "choice"
+default = "16:9"
+
+[[option.choice]]
+value = "16:9"
+label = "16:9"
+
+[[option.choice]]
+value = "21:9"
+label = "21:9"
+
+[[plugin]]
+feature = "widescreen"
+id = "crash.widescreen"

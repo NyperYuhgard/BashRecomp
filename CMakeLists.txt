@@ -31,8 +31,8 @@ endif()
 set(TOMBA_GENERATED_DISPATCH
     "${CMAKE_CURRENT_SOURCE_DIR}/generated/SCUS_945.70_dispatch.c")
 
-#file(GLOB TOMBA_MOD_PLUGIN_SOURCES CONFIGURE_DEPENDS
-#    "${CMAKE_CURRENT_SOURCE_DIR}/src/mods/*.c")
+file(GLOB TOMBA_MOD_PLUGIN_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/mods/*.c")
 
 psxrecomp_add_runtime_target(psx-runtime
     # The framework's GAME_GENERATED_FULL_C argument is singular. Keep the
@@ -50,14 +50,14 @@ psxrecomp_add_runtime_target(psx-runtime
 
 # Preload the game-owned catalog. Features remain disabled until selected in
 # the launcher, and plugin ids resolve only to implementations compiled above.
-#set(TOMBA_PRELOADED_MODS "${CMAKE_CURRENT_SOURCE_DIR}/mods/preloaded")
-#if(EXISTS "${TOMBA_PRELOADED_MODS}/packages")
-#    add_custom_command(TARGET psx-runtime POST_BUILD
-#        COMMAND ${CMAKE_COMMAND} -E copy_directory
-#            "${TOMBA_PRELOADED_MODS}"
-#            "$<TARGET_FILE_DIR:psx-runtime>/mods"
-#        COMMENT "Preloading the Tomba mod catalog")
-#endif()
+set(TOMBA_PRELOADED_MODS "${CMAKE_CURRENT_SOURCE_DIR}/mods/preloaded")
+if(EXISTS "${TOMBA_PRELOADED_MODS}/packages")
+    add_custom_command(TARGET psx-runtime POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${TOMBA_PRELOADED_MODS}"
+            "$<TARGET_FILE_DIR:psx-runtime>/mods"
+        COMMENT "Preloading the Tomba mod catalog")
+endif()
 
 # First-divergence co-sim oracle build (COSIM_ORACLE.md): clean, deterministic,
 # PSX_NO_DEBUG_TOOLS + PSX_COSIM. Two of these (one normal, one PSX_FORCE_INTERP=1)

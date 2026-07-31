@@ -1,0 +1,57 @@
+format_version = 5
+id = "crash.frame_interp_pack"
+version = "1.0.0"
+name = "Crash Bandicoot Frame Interpolation"
+author = "Nyper"
+description = "Interpola la imagen entre frames completados para una reproducción más fluida (120/240 Hz). Deja el ritmo del juego, los temporizadores y el audio a 60 Hz originales."
+license = "MIT"
+resolver = "declarative"
+
+[[target]]
+game_id = "SCUS-94570" # Pon aquí el ID de tu ISO de Crash (ej. SCUS-94154 / SLES-00039)
+
+[[feature]]
+id = "frame-interpolation"
+name = "Frame Interpolation"
+description = "Suaviza la imagen interpolando entre frames en el presentador (requiere monitor a 120/240 Hz para notarlo)."
+default_enabled = false
+
+[[option]]
+feature = "frame-interpolation"
+id = "rate"
+label = "Tasa de salida"
+description = "Velocidad a la que el presentador emite frames interpolados. 'Pantalla' sigue el refresco del monitor."
+type = "choice"
+default = "display"
+
+[[option.choice]]
+value = "display"
+label = "Pantalla"
+
+[[option.choice]]
+value = "120"
+label = "120 FPS"
+
+[[option.choice]]
+value = "240"
+label = "240 FPS"
+
+[[option]]
+feature = "frame-interpolation"
+id = "blend"
+label = "Modo de mezcla"
+description = "Motion-adaptive reduce las estelas/artefactos de doble imagen en objetos en movimiento."
+type = "choice"
+default = "motion-adaptive"
+
+[[option.choice]]
+value = "motion-adaptive"
+label = "Motion-adaptive"
+
+[[option.choice]]
+value = "linear"
+label = "Lineal"
+
+[[plugin]]
+feature = "frame-interpolation"
+id = "crash.frame-interpolation"
