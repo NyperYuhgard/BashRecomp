@@ -5,6 +5,8 @@ extern void psx_check_interrupts_dispatch_entry(CPUState* cpu, uint32_t resume_p
 
 extern int dirty_ram_text_native_ok_ranges_from(const uint32_t* lo_len_pairs, uint32_t count, uint32_t exec_pc);
 
+extern int dirty_ram_text_native_ok_ranges(const uint32_t* lo_len_pairs, uint32_t count);
+
 /* Forward declarations for all recompiled functions */
 extern void func_80010000(CPUState* cpu);
 extern void func_80010158(CPUState* cpu);
@@ -16857,13 +16859,22 @@ static const PsxGameDispatchEntry k_psx_game_dispatch[] = {
 };
 #define PSX_GAME_DISPATCH_COUNT 14318u
 
+/* PS1 segments alias the same physical RAM. A game whose PS-X EXE
+ * header carries KUSEG addresses (load address and entry PC without the
+ * KSEG bit) executes with a KUSEG PC, while this table is keyed by the
+ * recompiler's KSEG-normalized addresses. Comparing raw values made every
+ * lookup fail for such a title: 0x0001xxxx is always below 0x8001xxxx, so
+ * the search collapsed and returned no entry, silently routing all game
+ * code to the interpreter. Compare the 29-bit physical address instead;
+ * the table is sorted by the same masked key. */
 static const PsxGameDispatchEntry* psx_game_find_entry(uint32_t addr) {
+    const uint32_t want = addr & 0x1FFFFFFFu;
     uint32_t lo = 0, hi = PSX_GAME_DISPATCH_COUNT;
     while (lo < hi) {
         uint32_t mid = lo + (hi - lo) / 2;
-        uint32_t key = k_psx_game_dispatch[mid].addr;
-        if (addr < key) hi = mid;
-        else if (addr > key) lo = mid + 1;
+        uint32_t key = k_psx_game_dispatch[mid].addr & 0x1FFFFFFFu;
+        if (want < key) hi = mid;
+        else if (want > key) lo = mid + 1;
         else return &k_psx_game_dispatch[mid];
     }
     return 0;
@@ -16875,6 +16886,14 @@ int psx_game_text_native_ok(uint32_t addr) {
     if (!entry || entry->range_count == 0) return 0;
     return dirty_ram_text_native_ok_ranges_from(
         &k_psx_game_code_ranges[entry->range_index].lo, entry->range_count, addr);
+}
+
+/* Full-range validity for straight-line interpreter-to-AOT handoff. */
+int psx_game_text_native_ok_full(uint32_t addr) {
+    const PsxGameDispatchEntry* entry = psx_game_find_entry(addr);
+    if (!entry || entry->range_count == 0) return 0;
+    return dirty_ram_text_native_ok_ranges(
+        &k_psx_game_code_ranges[entry->range_index].lo, entry->range_count);
 }
 
 /* Maps PS1 address to compiled game code. Returns 1 if dispatched, 0 if unknown. */

@@ -9,6 +9,7 @@ load_address = "0x80010000"
 entry_pc = "0x8002E7B0"
 text_size = "0x69000"
 stack_base = "0x801FFFF0"
+players = 4
 
 [recompiler]
 seeds = "seeds/bash_funcs.txt"
@@ -19,3 +20,10 @@ out_dir = "generated"
 # debug_port = 4370
 window_title = "Bash Recompiled"
 bios_hle = false
+
+[netplay]
+require_cue = true
+required_tracks = 1
+
+[controller]
+multitap_analog = true

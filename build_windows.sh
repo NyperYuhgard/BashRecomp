@@ -36,7 +36,9 @@ cmake -S . -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86_64.cmake \
     -DPSX_MINGW_EXTRA_PREFIX="$ZLIB_PREFIX" \
     -DCMAKE_DISABLE_FIND_PACKAGE_SDL3=ON \
-    -DRECOMP_UI_ENABLE_MODS:BOOL=ON
+    -DRECOMP_UI_ENABLE_MODS:BOOL=ON \
+    -DPSX_NETPLAY:BOOL=ON \
+    -DPSX_MAX_PLAYERS=4
 cmake --build build-win --target psx-runtime
 
 echo
